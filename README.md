@@ -4,8 +4,15 @@
 upon cloning of the repository on a new Ec2 (or any provider for that matter) ubuntu machine, run '''dockerinstall.sh''' to install docker and be able to move further
 
 to do so:
-1. execute: '''chmod -x dockerinstall.sh'''
-2. execute: '''sudo bash dockerinstall.sh''', as this will install docker and test it using the hello world image; ensure you are able to see the image results on console
+1. execute: 
+'''
+chmod -x dockerinstall.sh
+'''
+2. execute: 
+'''
+sudo bash dockerinstall.sh
+'''
+This will install docker and test it using the hello world image; ensure you are able to see the image results on console
 3. move onto the project component's folder you want to run on the machine
 
 ## folders
