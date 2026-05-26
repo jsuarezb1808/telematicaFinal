@@ -33,7 +33,7 @@ The DB is currently running using postgres, the database uses the init.sql file 
 * 5432
 
 ### Deployment
-in order to deploy the database we will follow these steps:
+in order to deploy the database you will follow these steps:
 1. open the Database folder
 2. run the command ```docker compose up -d``` in order to execute the container in detached mode
 3. confirm the image is running by using ```docker ps```, this will list all the currently running images, in this scenario, the image we are looking for is "postgres:16-alpine"
@@ -42,11 +42,11 @@ in order to deploy the database we will follow these steps:
 if you want to perform further checks to ensure the database was correctly set up with it's fields, follow these steps:
 1. use  ```docker ps ``` and get the name of the image 
 2. use ```docker exec -it <image name> psql -U admin -d proyecto_final```
-3. on the postgres CLI use ```\d``` to list all the current tables
+3. on the postgres CLI use ```\d``` to list all the current tables, you should be able to see the "registros" table described on the init.sql file inside the folder 
 
-in case that you get an error while using a docker command similar to:
- ```permission denied while trying to connect to the docker API at unix:///var/run/docker.sock```
- you might not be added to the user group who is authorized to do so, in that case use ```sudo``` to move forward
+>[!IMPORTANT]
+>in case that you get an error while using a docker command similar to:```permission denied while trying to connect to the docker API at unix:///var/run/docker.sock``` you might not be added to the user group who is authorized to do so, in that case use ```sudo``` to move forward
+
 ---
 ## web (1)
 
