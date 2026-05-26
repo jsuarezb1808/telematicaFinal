@@ -22,20 +22,51 @@ the project has the following component's folders:
 in order to move forward go to the dedicated section for each component.
 
 > [!NOTE]
-> is suggested to go over the deployment of each component as follows: Database => Web(1) => Web(2) => Nginx ; the order will not affect the deployment process, however, it will be the step by step process followed
+> is suggested to go over the deployment of each component as follows: Database => Web(1) => Web(2) => Nginx ; the order will not affect the deployment process, however it will ensure everything is properly set up, it will be the step by step processfollowed
 
+> [!WARNING]
+> At the start of each section you will find a port list, ensure the machines running the component have these ports open to ensure the correct working, otherwhise, if it is not posible to do so, ensure to change the port wich each component is listening to on the docker compose section
+--- 
 ## Database
+The DB is currently running using postgres, the database uses the init.sql file to set up and run the database on the computer, allowing the machine to receive any database releated requests over the port 5432
+### Ports
+* 5432
+
+### Deployment
+in order to deploy the database we will follow these steps:
+1. open the Database folder
+2. run the command ```docker compose up -d``` in order to execute the container in detached mode
+3. confirm the image is running by using ```docker ps```, this will list all the currently running images, in this scenario, the image we are looking for is "postgres:16-alpine"
 
 
+if you want to perform further checks to ensure the database was correctly set up with it's fields, follow these steps:
+1. use  ```docker ps ``` and get the name of the image 
+2. use ```docker exec -it <image name> psql -U admin -d proyecto_final```
+3. on the postgres CLI use ```\d``` to list all the current tables
 
+in case that you get an error while using a docker command similar to:
+ ```permission denied while trying to connect to the docker API at unix:///var/run/docker.sock```
+ you might not be added to the user group who is authorized to do so, in that case use ```sudo``` to move forward
+---
 ## web (1)
 
+### Ports
+* 
+
+### Deployment
+
+---
 ## web (2)
+### Ports
+* 
 
+### Deployment
+
+---
 ## nginx
-in order to run the load balancer this project is currently using Nginx 
 
+### Ports
+* 
 
-### used ports:
-* 1000: due to the usage of docker, the image will be listening through the port 1000; if needed, the settings on docker compose can be changed to set the port connected to the "physical" or virtual port
+### Deployment
 
