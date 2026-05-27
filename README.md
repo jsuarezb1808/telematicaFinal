@@ -49,21 +49,29 @@ if you want to perform further checks to ensure the database was correctly set u
 
 ---
 ## web (1) [ESP]
-this is the user interface that was created in order to access the data and allow users to submit data, it's the spanish version of the site
+this is the user interface that was be created in order to access the data and allow users to submit data and view/request an email with a statistic breakdown of the collected data, it's the english version of the site
 ### Ports
 * 5000
 
 ### Deployment
+in order to deploy the web page, you need to follow these steps:
+1. go to the web folder
+2. open the docker-compose file  and change the ```DB_HOST``` to your database internal IP under the web-app-es service 
+3. use  docker ```compose up -d web-app-es``` to deploy the ESP version of the web page
 
 ---
 ## web (2) [ENG]
-this is the user interface that was be created in order to access the data and allow users to submit data, it's the english version of the site
+this is the user interface that was be created in order to access the data and allow users to submit data and view/request an email with a statistic breakdown of the collected data, it's the english version of the site
 
 ### Ports
 * 5001
 
 ### Deployment
-
+in order to deploy the web page, you need to follow these steps:
+in order to deploy the web page, you need to follow these steps:
+1. go to the web folder
+2. open the docker-compose file  and change the ```DB_HOST``` to your database internal IP under the web-app-en service 
+3. use  docker ```compose up -d web-app-en``` to deploy the ESP version of the web page
 ---
 ## nginx
 

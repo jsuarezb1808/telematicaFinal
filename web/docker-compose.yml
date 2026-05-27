@@ -17,7 +17,6 @@ services:
       LANGUAGE: es
       FLASK_ENV: production
       FLASK_APP: app.py
-      SECRET_KEY: ${SECRET_KEY:-tu-clave-secreta-cambiar-en-produccion}
     ports:
       - "5000:5000"
     volumes:
@@ -54,7 +53,7 @@ services:
       LANGUAGE: en
       FLASK_ENV: production
       FLASK_APP: app.py
-      SECRET_KEY: ${SECRET_KEY:-tu-clave-secreta-cambiar-en-produccion}
+      
     ports:
       - "5001:5000"  # Puerto diferente (5001)
     volumes:
