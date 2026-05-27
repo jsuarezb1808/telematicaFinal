@@ -19,12 +19,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Directorio de trabajo
 WORKDIR /app
 
-# Copiar requirements primero (para cache de docker)
-COPY ./requirements.txt .
-
 # Instalar dependencias Python
 RUN pip install --upgrade pip setuptools wheel && \
-    pip install -r requirements.txt && \
+    pip install  Flask==2.3.0 && \
+    pip install Flask-Mail==0.9.1 && \
+    pip install psycopg2-binary && \
+    pip install Werkzeug==2.3.0 && \
     pip install gunicorn
 
 # Copiar código de aplicación
