@@ -25,9 +25,6 @@ services:
       - ./logs:/app/logs
       # Desarrollo (comentar en producción)
       # - ./web-app:/app
-    depends_on:
-      postgres:
-        condition: service_healthy
     networks:
       - eafit-network
     healthcheck:
@@ -62,9 +59,7 @@ services:
       - "5001:5000"  # Puerto diferente (5001)
     volumes:
       - ./logs:/app/logs
-    depends_on:
-      postgres:
-        condition: service_healthy
+
     networks:
       - eafit-network
     healthcheck:
@@ -86,27 +81,3 @@ volumes:
 networks:
   eafit-network:
     driver: bridge
-
-# ==========================================
-# NOTAS
-# ==========================================
-# 
-# DESARROLLO:
-#   docker-compose up
-#   Accede a:
-#     - ES: http://localhost:5000
-#     - EN: http://localhost:5001
-#     - DB: localhost:5432
-#
-# PRODUCCIÓN:
-#   1. Cambiar SECRET_KEY en .env
-#   2. Usar docker-compose -f docker-compose.yml -f docker-compose.prod.yml up
-#   3. Agregar HTTPS/SSL (Let's Encrypt)
-#   4. Descomentar NGINX para load balancing
-#
-# COMANDOS ÚTILES:
-#   docker-compose up -d          # Background
-#   docker-compose logs -f        # Ver logs
-#   docker-compose ps             # Status
-#   docker-compose exec postgres psql -U admin -d proyecto_final  # Conectar BD
-#   docker-compose down -v        # Eliminar todo (incluyendo BD!)

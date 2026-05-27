@@ -35,7 +35,7 @@ The DB is currently running using postgres, the database uses the init.sql file 
 ### Deployment
 in order to deploy the database you will follow these steps:
 1. open the Database folder
-2. run the command ```docker compose up -d``` in order to execute the container in detached mode
+2. run the command ```docker compose up```
 3. confirm the image is running by using ```docker ps```, this will list all the currently running images, in this scenario, the image we are looking for is "postgres:16-alpine"
 
 
@@ -48,25 +48,50 @@ if you want to perform further checks to ensure the database was correctly set u
 >in case that you get an error while using a docker command similar to:```permission denied while trying to connect to the docker API at unix:///var/run/docker.sock``` you might not be added to the user group who is authorized to do so, in that case use ```sudo``` to move forward
 
 ---
-## web (1)
-
+## web (1) [ESP]
+this is the user interface that was created in order to access the data and allow users to submit data, it's the spanish version of the site
 ### Ports
-* 
+* 5000
 
 ### Deployment
 
 ---
-## web (2)
+## web (2) [ENG]
+this is the user interface that was be created in order to access the data and allow users to submit data, it's the english version of the site
+
 ### Ports
-* 
+* 5001
 
 ### Deployment
 
 ---
 ## nginx
 
+this component acts as the load balancer of the project and ensures the users are distributed across machines evenly, it also provides a SSL certificate from certbot,since certbot needs to have a machine running to be able to provide the appropiate certificates
+
 ### Ports
-* 
+* 443
+* 80
 
 ### Deployment
+
+in order to deploy nginx you need to follow these steps:
+
+1. go to the nginx folder
+2. open the nginx folder inside of it so you can edit the config files
+3. on the file ```confdummie.d``` you will find the ```server_name``` attribute under the server section, change it to the domain you have and want to set up for the project; this will allow you to obtain the certificates needed.
+4. change the ```server``` attributes under ```upstream backend_servers``` to the private IP of each machine hosting the webs, the order does not matter
+5. go out of the nginx folder, ensure that you are on the right folder by using ```ls``` and confirm you see the nginx folder and the ```docker-compose``` file
+6. run the command ```docker compose up```
+7. even though certbot can take a few seconds to create the certificates needed to execute the project, it is recommended to wait at least 1 minute in order to use the command ```docker compose down``` to shut down the container and keep the generated certificates
+8. open the ```docker-compose``` file, and go to the ```volumes``` section
+9. on the line ```- ./nginx/confdummie.d:/etc/nginx/conf.d:ro``` change the "confdummie.d" segment to "conf.d"; the line should look like ```- ./nginx/conf.d:/etc/nginx/conf.d:ro``` and save the changes
+10. open the nginx folder 
+11. open the ```conf.d```
+12. apply the same changes on step 4 
+13. on both server sections, change the ```server_name``` to the domain you want to use
+14. on the last server section, you will find the attributes ```ssl_certificate``` and ```ssl_certificate_key``` change it's values so it points to a folder with your domain name it should look like this:
+    * ```ssl_certificate /etc/letsencrypt/live/<your domain>/fullchain.pem;```
+    * ```ssl_certificate_key /etc/letsencrypt/live/<your domain>/privkey.pem;```
+15. use ```docker compose up``` 
 
