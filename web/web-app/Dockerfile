@@ -20,7 +20,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 WORKDIR /app
 
 # Copiar requirements primero (para cache de docker)
-COPY requirements.txt .
+COPY ./requirements.txt .
 
 # Instalar dependencias Python
 RUN pip install --upgrade pip setuptools wheel && \
