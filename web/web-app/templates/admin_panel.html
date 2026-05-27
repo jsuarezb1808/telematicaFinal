@@ -1,0 +1,717 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Panel de Administrador - EAFIT Registros</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <style>
+      :root {
+        --primary: #2c5aa0;
+        --secondary: #1e3a5f;
+        --success: #27ae60;
+        --danger: #e74c3c;
+        --light: #f8f9fa;
+        --white: #ffffff;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        background: linear-gradient(
+          135deg,
+          var(--primary) 0%,
+          var(--secondary) 100%
+        );
+        min-height: 100vh;
+        padding: 20px 0;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+
+      .navbar {
+        background: linear-gradient(
+          135deg,
+          var(--primary) 0%,
+          var(--secondary) 100%
+        );
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+        border-bottom: 3px solid #3498db;
+      }
+
+      .navbar-brand {
+        font-weight: 700;
+        font-size: 1.5rem;
+        color: white !important;
+      }
+
+      .navbar-brand i {
+        margin-right: 10px;
+      }
+
+      .container-main {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      .page-title {
+        color: white;
+        margin-bottom: 30px;
+        font-weight: 700;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      }
+
+      .card {
+        border: none;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        transition:
+          transform 0.3s ease,
+          box-shadow 0.3s ease;
+        margin-bottom: 25px;
+        overflow: hidden;
+      }
+
+      .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+      }
+
+      .card-header {
+        background: linear-gradient(
+          135deg,
+          var(--primary) 0%,
+          var(--secondary) 100%
+        );
+        color: white;
+        border: none;
+        padding: 20px;
+        font-weight: 600;
+        font-size: 1.1rem;
+      }
+
+      .card-header i {
+        margin-right: 10px;
+      }
+
+      .card-body {
+        padding: 25px;
+      }
+
+      .chart-container {
+        position: relative;
+        height: 300px;
+        margin-bottom: 20px;
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+      }
+
+      .stat-box {
+        background: linear-gradient(135deg, #2c5aa0 0%, #3498db 100%);
+        color: white;
+        padding: 25px;
+        border-radius: 10px;
+        text-align: center;
+        box-shadow: 0 4px 15px rgba(44, 90, 160, 0.3);
+      }
+
+      .stat-box i {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+        opacity: 0.8;
+      }
+
+      .stat-number {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin: 10px 0;
+      }
+
+      .stat-label {
+        font-size: 0.9rem;
+        opacity: 0.9;
+      }
+
+      .btn-custom {
+        padding: 12px 25px;
+        font-weight: 600;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+        font-size: 1rem;
+      }
+
+      .btn-primary-custom {
+        background: linear-gradient(135deg, var(--primary) 0%, #3498db 100%);
+        color: white;
+      }
+
+      .btn-primary-custom:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(44, 90, 160, 0.4);
+      }
+
+      .btn-success-custom {
+        background: linear-gradient(135deg, var(--success) 0%, #229954 100%);
+        color: white;
+      }
+
+      .btn-success-custom:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(39, 174, 96, 0.4);
+      }
+
+      .btn-group-custom {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 20px;
+      }
+
+      .btn-group-custom .btn-custom {
+        flex: 1;
+        min-width: 150px;
+      }
+
+      .alert-custom {
+        border-radius: 8px;
+        border: none;
+        padding: 15px 20px;
+        margin-bottom: 20px;
+        display: none;
+      }
+
+      .alert-success-custom {
+        background-color: #d4edda;
+        color: #155724;
+        border-left: 4px solid var(--success);
+      }
+
+      .alert-danger-custom {
+        background-color: #f8d7da;
+        color: #721c24;
+        border-left: 4px solid var(--danger);
+      }
+
+      .spinner-custom {
+        display: none;
+        text-align: center;
+        padding: 20px;
+      }
+
+      .spinner-border-custom {
+        color: var(--primary);
+      }
+
+      .info-box {
+        background-color: #e8f4f8;
+        border-left: 4px solid var(--primary);
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        color: #333;
+      }
+
+      .info-box i {
+        color: var(--primary);
+        margin-right: 10px;
+      }
+
+      .table-responsive-custom {
+        border-radius: 8px;
+        overflow: hidden;
+      }
+
+      table {
+        margin-bottom: 0;
+      }
+
+      thead {
+        background: linear-gradient(
+          135deg,
+          var(--primary) 0%,
+          var(--secondary) 100%
+        );
+        color: white;
+      }
+
+      th {
+        font-weight: 600;
+        border: none;
+        padding: 15px;
+      }
+
+      td {
+        padding: 12px 15px;
+        border-color: #e0e0e0;
+      }
+
+      tbody tr:hover {
+        background-color: #f8f9fa;
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        color: #999;
+      }
+
+      .empty-state i {
+        font-size: 3rem;
+        margin-bottom: 15px;
+        opacity: 0.5;
+      }
+
+      .loading-spinner {
+        display: inline-block;
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      @media (max-width: 768px) {
+        .stats-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .btn-group-custom {
+          flex-direction: column;
+        }
+
+        .btn-group-custom .btn-custom {
+          width: 100%;
+        }
+
+        .card-body {
+          padding: 15px;
+        }
+      }
+
+      footer {
+        margin-top: 40px;
+        text-align: center;
+        color: white;
+        padding: 20px;
+        opacity: 0.8;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-dark">
+      <div class="container-fluid">
+        <span class="navbar-brand">
+          <i class="fas fa-chart-line"></i>
+          Panel de Administrador - EAFIT
+        </span>
+      </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="container-main">
+      <h1 class="page-title mt-5">
+        <i class="fas fa-tachometer-alt"></i>
+        Dashboard de Registros
+      </h1>
+
+      <!-- Alert Messages -->
+      <div id="alertSuccess" class="alert-custom alert-success-custom">
+        <i class="fas fa-check-circle"></i>
+        <span id="alertSuccessText"></span>
+      </div>
+      <div id="alertError" class="alert-custom alert-danger-custom">
+        <i class="fas fa-exclamation-circle"></i>
+        <span id="alertErrorText"></span>
+      </div>
+
+      <!-- Stats Row -->
+      <div class="stats-grid">
+        <div class="stat-box">
+          <i class="fas fa-users"></i>
+          <div class="stat-number" id="totalRegisters">-</div>
+          <div class="stat-label">Total de Registros</div>
+        </div>
+        <div
+          class="stat-box"
+          style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%)"
+        >
+          <i class="fas fa-map-marker-alt"></i>
+          <div class="stat-number" id="totalCommunies">-</div>
+          <div class="stat-label">Comunas Registradas</div>
+        </div>
+        <div
+          class="stat-box"
+          style="background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%)"
+        >
+          <i class="fas fa-graduation-cap"></i>
+          <div class="stat-number" id="totalCareers">-</div>
+          <div class="stat-label">Carreras de Interés</div>
+        </div>
+      </div>
+
+      <!-- Charts Row -->
+      <div class="row">
+        <div class="col-lg-6">
+          <div class="card">
+            <div class="card-header">
+              <i class="fas fa-city"></i>
+              Registros por Comuna
+            </div>
+            <div class="card-body">
+              <div class="chart-container">
+                <canvas id="communeChart"></canvas>
+              </div>
+              <div id="communeTableContainer">
+                <table class="table table-sm">
+                  <thead>
+                    <tr>
+                      <th>Comuna</th>
+                      <th>Cantidad</th>
+                    </tr>
+                  </thead>
+                  <tbody id="communeTableBody">
+                    <tr>
+                      <td colspan="2" class="text-center text-muted">
+                        <i class="fas fa-spinner fa-spin"></i> Cargando...
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-6">
+          <div class="card">
+            <div class="card-header">
+              <i class="fas fa-book"></i>
+              Registros por Carrera
+            </div>
+            <div class="card-body">
+              <div class="chart-container">
+                <canvas id="careerChart"></canvas>
+              </div>
+              <div id="careerTableContainer">
+                <table class="table table-sm">
+                  <thead>
+                    <tr>
+                      <th>Carrera</th>
+                      <th>Cantidad</th>
+                    </tr>
+                  </thead>
+                  <tbody id="careerTableBody">
+                    <tr>
+                      <td colspan="2" class="text-center text-muted">
+                        <i class="fas fa-spinner fa-spin"></i> Cargando...
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions Card -->
+      <div class="card">
+        <div class="card-header">
+          <i class="fas fa-tasks"></i>
+          Acciones del Administrador
+        </div>
+        <div class="card-body">
+          <div class="info-box">
+            <i class="fas fa-info-circle"></i>
+            <strong>¿Qué es esto?</strong> Aquí puedes generar y enviar reportes
+            automáticos de estadísticas al correo deseado.
+          </div>
+
+          <div class="mb-3">
+            <label for="emailInput" class="form-label">
+              <i class="fas fa-envelope"></i> Correo Electrónico del
+              Destinatario
+            </label>
+            <input
+              type="email"
+              class="form-control"
+              id="emailInput"
+              placeholder="ejemplo@eafit.edu.co"
+              value="ialondonoo@eafit.edu.co"
+              required
+            />
+            <small class="form-text text-muted"
+              >Ingresa el correo a donde deseas recibir el reporte</small
+            >
+          </div>
+
+          <button
+            class="btn btn-custom btn-success-custom"
+            onclick="sendReport()"
+          >
+            <i class="fas fa-envelope"></i> Enviar Reporte por Correo
+          </button>
+
+          <div id="spinner" class="spinner-custom">
+            <div class="spinner-border spinner-border-custom" role="status">
+              <span class="visually-hidden">Enviando...</span>
+            </div>
+            <p class="mt-2">Enviando reporte...</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <footer>
+        <p>
+          <strong>EAFIT Registros</strong> - Proyecto Final Internet:
+          Arquitectura y Protocolos
+        </p>
+        <p>Sistema de Registro para Estudiantes Potenciales</p>
+      </footer>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      let communeChart, careerChart;
+
+      // Cargar datos al iniciar
+      document.addEventListener("DOMContentLoaded", function () {
+        loadStatistics();
+        setInterval(loadStatistics, 30000); // Actualizar cada 30 segundos
+      });
+
+      function loadStatistics() {
+        fetch("/api/statistics")
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.error) {
+              showAlert("error", "Error al cargar estadísticas: " + data.error);
+              return;
+            }
+
+            // Actualizar números
+            document.getElementById("totalRegisters").textContent = data.total;
+            document.getElementById("totalCommunies").textContent = Object.keys(
+              data.communes,
+            ).length;
+            document.getElementById("totalCareers").textContent = Object.keys(
+              data.careers,
+            ).length;
+
+            // Actualizar gráficas
+            updateCharts(data);
+
+            // Actualizar tablas
+            updateTables(data);
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            showAlert("error", "Error de conexión al servidor");
+          });
+      }
+
+      function updateCharts(data) {
+        const communeCtx = document
+          .getElementById("communeChart")
+          .getContext("2d");
+        const careerCtx = document
+          .getElementById("careerChart")
+          .getContext("2d");
+
+        // Destruir gráficas anteriores si existen
+        if (communeChart) communeChart.destroy();
+        if (careerChart) careerChart.destroy();
+
+        // Preparar datos de comunas
+        const communeLabels = Object.keys(data.communes).sort(
+          (a, b) => parseInt(a) - parseInt(b),
+        );
+        const communeValues = communeLabels.map((c) => data.communes[c]);
+
+        // Gráfica de comunas
+        communeChart = new Chart(communeCtx, {
+          type: "bar",
+          data: {
+            labels: communeLabels.map((c) => `Comuna ${c}`),
+            datasets: [
+              {
+                label: "Registros",
+                data: communeValues,
+                backgroundColor: "rgba(44, 90, 160, 0.7)",
+                borderColor: "rgba(44, 90, 160, 1)",
+                borderWidth: 2,
+                borderRadius: 5,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                display: false,
+              },
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: {
+                  stepSize: 1,
+                },
+              },
+            },
+          },
+        });
+
+        // Gráfica de carreras
+        const careerLabels = Object.keys(data.careers);
+        const careerValues = careerLabels.map((c) => data.careers[c]);
+
+        const colors = ["#2c5aa0", "#e74c3c", "#9b59b6", "#27ae60"];
+
+        careerChart = new Chart(careerCtx, {
+          type: "doughnut",
+          data: {
+            labels: careerLabels,
+            datasets: [
+              {
+                data: careerValues,
+                backgroundColor: colors.slice(0, careerLabels.length),
+                borderColor: "#fff",
+                borderWidth: 2,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: "bottom",
+              },
+            },
+          },
+        });
+      }
+
+      function updateTables(data) {
+        // Tabla de comunas
+        const communeBody = document.getElementById("communeTableBody");
+        communeBody.innerHTML = "";
+        const communeLabels = Object.keys(data.communes).sort(
+          (a, b) => parseInt(a) - parseInt(b),
+        );
+        communeLabels.forEach((commune) => {
+          const row = `<tr><td>Comuna ${commune}</td><td><strong>${data.communes[commune]}</strong></td></tr>`;
+          communeBody.innerHTML += row;
+        });
+
+        // Tabla de carreras
+        const careerBody = document.getElementById("careerTableBody");
+        careerBody.innerHTML = "";
+        Object.keys(data.careers).forEach((career) => {
+          const row = `<tr><td>${career}</td><td><strong>${data.careers[career]}</strong></td></tr>`;
+          careerBody.innerHTML += row;
+        });
+      }
+
+      function sendReport() {
+        const emailInput = document.getElementById("emailInput");
+        const email = emailInput.value.trim();
+
+        // Validar correo
+        if (!email) {
+          showAlert("error", "❌ Por favor ingresa un correo electrónico");
+          return;
+        }
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+          showAlert(
+            "error",
+            "❌ Por favor ingresa un correo electrónico válido",
+          );
+          return;
+        }
+
+        const btn = event.target;
+        const spinner = document.getElementById("spinner");
+
+        btn.disabled = true;
+        spinner.style.display = "block";
+
+        fetch("/admin/send-report", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: email,
+          }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            spinner.style.display = "none";
+            btn.disabled = false;
+
+            if (data.success) {
+              showAlert(
+                "success",
+                "✅ Reporte enviado correctamente a " + email,
+              );
+            } else {
+              showAlert("error", "❌ Error al enviar reporte: " + data.error);
+            }
+          })
+          .catch((error) => {
+            spinner.style.display = "none";
+            btn.disabled = false;
+            showAlert("error", "❌ Error de conexión: " + error.message);
+          });
+      }
+
+      function showAlert(type, message) {
+        const alertSuccess = document.getElementById("alertSuccess");
+        const alertError = document.getElementById("alertError");
+
+        if (type === "success") {
+          alertError.style.display = "none";
+          document.getElementById("alertSuccessText").textContent = message;
+          alertSuccess.style.display = "block";
+          setTimeout(() => (alertSuccess.style.display = "none"), 5000);
+        } else {
+          alertSuccess.style.display = "none";
+          document.getElementById("alertErrorText").textContent = message;
+          alertError.style.display = "block";
+          setTimeout(() => (alertError.style.display = "none"), 5000);
+        }
+      }
+    </script>
+  </body>
+</html>

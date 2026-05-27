@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Estudiantes EAFIT</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2c5aa0;
+            --secondary: #1e3a5f;
+            --light: #f8f9fa;
+            --success: #27ae60;
+            --danger: #e74c3c;
+            --info: #3498db;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; }
+        body {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .navbar-custom { background: white; box-shadow: 0 4px 12px rgba(0,0,0,0.1); padding: 15px 0; }
+        .navbar-brand-custom { font-weight: 700; font-size: 1.4rem; color: var(--primary) !important; display: flex; align-items: center; gap: 10px; }
+        .navbar-brand-custom i { color: var(--info); }
+        .nav-link-custom { color: #333 !important; margin-left: 20px; font-weight: 500; transition: color 0.3s; }
+        .nav-link-custom:hover { color: var(--primary) !important; }
+        .nav-link-custom.admin { background: linear-gradient(135deg, var(--primary) 0%, var(--info) 100%); color: white !important; padding: 8px 16px !important; border-radius: 6px; }
+
+        .main-container { flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px 20px; }
+        .form-container {
+            background: white; border-radius: 15px; box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            overflow: hidden; max-width: 550px; width: 100%; animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+
+        .form-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--info) 100%);
+            color: white; padding: 40px 30px; text-align: center;
+        }
+        .form-header h1 { font-size: 2rem; margin: 0; font-weight: 700; }
+        .form-header p { margin: 10px 0 0 0; opacity: 0.9; font-size: 0.95rem; }
+
+        .form-body { padding: 40px 30px; }
+
+        .alert-custom { border-radius: 8px; border: none; padding: 15px 20px; margin-bottom: 20px; display: none; animation: slideDown 0.3s ease; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        .alert-success-custom { background-color: #d4edda; color: #155724; border-left: 4px solid var(--success); }
+        .alert-danger-custom { background-color: #f8d7da; color: #721c24; border-left: 4px solid var(--danger); }
+
+        .form-group-custom { margin-bottom: 25px; }
+        label { display: block; margin-bottom: 10px; font-weight: 600; color: #333; font-size: 0.95rem; }
+        label i { margin-right: 8px; color: var(--primary); }
+
+        .form-control, .form-select {
+            border: 2px solid #e0e0e0; border-radius: 8px; padding: 12px 15px; font-size: 0.95rem; transition: all 0.3s ease;
+        }
+        .form-control:focus, .form-select:focus { border-color: var(--primary); box-shadow: 0 0 0 0.2rem rgba(44, 90, 160, 0.15); }
+
+        .radio-group { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-top: 10px; }
+        .radio-option { position: relative; }
+        .radio-option input[type="radio"] { display: none; }
+        .radio-label {
+            display: flex; align-items: center; padding: 15px; border: 2px solid #e0e0e0; border-radius: 8px;
+            cursor: pointer; transition: all 0.3s; background: white; font-weight: 500; user-select: none;
+        }
+        .radio-option input[type="radio"]:checked + .radio-label {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--info) 100%);
+            color: white; border-color: var(--primary);
+        }
+        .radio-label i { margin-right: 8px; }
+
+        .btn-custom {
+            width: 100%; padding: 14px; font-weight: 600; border-radius: 8px; border: none; transition: all 0.3s ease;
+            font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;
+        }
+        .btn-submit { background: linear-gradient(135deg, var(--primary) 0%, var(--info) 100%); color: white; }
+        .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(44, 90, 160, 0.3); }
+        .btn-submit:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+
+        .footer-custom {
+            background: rgba(255, 255, 255, 0.1); color: white; text-align: center; padding: 30px 20px;
+            margin-top: auto; border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .footer-custom p { margin: 5px 0; font-size: 0.9rem; }
+        .footer-custom a { color: #3498db; text-decoration: none; font-weight: 600; }
+
+        @media (max-width: 768px) {
+            .form-header { padding: 30px 20px; }
+            .form-header h1 { font-size: 1.5rem; }
+            .form-body { padding: 25px 20px; }
+            .radio-group { grid-template-columns: 1fr; }
+            .main-container { padding: 20px 10px; }
+        }
+
+        .spinner-border-custom { width: 20px; height: 20px; display: none; }
+        .error-list { background-color: #fff3cd; border: 1px solid #ffc107; border-radius: 8px; padding: 15px; margin-bottom: 20px; display: none; }
+        .error-list ul { margin: 0; padding-left: 20px; color: #856404; }
+        .error-list li { margin: 5px 0; }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-custom">
+        <div class="container-fluid">
+            <span class="navbar-brand-custom">
+                <i class="fas fa-graduation-cap"></i>
+                EAFIT Registros
+            </span>
+            <span class="nav-link-custom admin">
+                <i class="fas fa-chart-line"></i>
+                <a href="/admin/panel" style="color: white; text-decoration: none;">Panel Admin</a>
+            </span>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <div class="form-container">
+            <div class="form-header">
+                <h1>📋 Registro EAFIT</h1>
+                <p>Portal para Registro de Estudiantes Potenciales</p>
+            </div>
+
+            <div class="form-body">
+                {% if mensaje %}
+                    <div class="alert alert-success alert-custom alert-success-custom" style="display: block;">
+                        <i class="fas fa-check-circle"></i>
+                        {{ mensaje }}
+                    </div>
+                {% endif %}
+
+                <div id="errorAlert" class="alert alert-danger alert-custom alert-danger-custom">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span id="errorText"></span>
+                </div>
+
+                <form id="registroForm" method="POST" novalidate>
+                    <div class="form-group-custom">
+                        <label for="nombre">
+                            <i class="fas fa-user"></i> Nombre Completo
+                        </label>
+                        <input type="text" id="nombre" name="nombre" class="form-control" placeholder="Ej: Juan Carlos Pérez" required>
+                    </div>
+
+                    <div class="form-group-custom">
+                        <label for="comuna">
+                            <i class="fas fa-map-marker-alt"></i> Comuna
+                        </label>
+                        <select id="comuna" name="comuna" class="form-select" required>
+                            <option value="">-- Selecciona una comuna --</option>
+                            <option value="1">Comuna 1 - Centro</option>
+                            <option value="2">Comuna 2 - Santa Cruz</option>
+                            <option value="3">Comuna 3 - Manrique</option>
+                            <option value="4">Comuna 4 - Arví</option>
+                            <option value="5">Comuna 5 - Castilla</option>
+                            <option value="6">Comuna 6 - Doce de Octubre</option>
+                            <option value="7">Comuna 7 - Robledo</option>
+                            <option value="8">Comuna 8 - Villa Hermosa</option>
+                            <option value="9">Comuna 9 - Buenos Aires</option>
+                            <option value="10">Comuna 10 - La Candelaria</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group-custom">
+                        <label for="fecha_ingreso">
+                            <i class="fas fa-calendar"></i> Fecha de Ingreso de Información
+                        </label>
+                        <input type="date" id="fecha_ingreso" name="fecha_ingreso" class="form-control" required>
+                    </div>
+
+                    <div class="form-group-custom">
+                        <label>
+                            <i class="fas fa-book"></i> Carrera de Interés
+                        </label>
+                        <div class="radio-group">
+                            <div class="radio-option">
+                                <input type="radio" id="carrera_med" name="carrera" value="Medicina" required>
+                                <label for="carrera_med" class="radio-label">
+                                    <i class="fas fa-heartbeat"></i> Medicina
+                                </label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="carrera_ing" name="carrera" value="Ingeniería" required>
+                                <label for="carrera_ing" class="radio-label">
+                                    <i class="fas fa-cogs"></i> Ingeniería
+                                </label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="carrera_law" name="carrera" value="Abogacía" required>
+                                <label for="carrera_law" class="radio-label">
+                                    <i class="fas fa-scale-balanced"></i> Abogacía
+                                </label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="carrera_lic" name="carrera" value="Licenciatura" required>
+                                <label for="carrera_lic" class="radio-label">
+                                    <i class="fas fa-graduation-cap"></i> Licenciatura
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-custom btn-submit" id="submitBtn">
+                        <span class="spinner-border spinner-border-sm spinner-border-custom" role="status" aria-hidden="true"></span>
+                        <span id="btnText">Registrar</span>
+                    </button>
+                </form>
+
+                <div style="text-align: center; margin-top: 20px; font-size: 0.85rem; color: #666;">
+                    <p>✅ Tus datos están protegidos y seguros</p>
+                    <p>📧 Recibirás confirmación por correo</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer-custom">
+        <p><strong>EAFIT</strong> - Registro de Estudiantes Potenciales</p>
+        <p>Proyecto Final: Internet Arquitectura y Protocolos</p>
+        <p>Universidad EAFIT - 2026 | <a href="mailto:ialondonoo@eafit.edu.co">Contacto</a></p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/validacion.js') }}"></script>
+</body>
+</html>
