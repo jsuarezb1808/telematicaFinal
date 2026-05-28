@@ -57,21 +57,21 @@ this is the user interface that was be created in order to access the data and a
 in order to deploy the web page, you need to follow these steps:
 1. go to the web folder
 2. open the docker-compose file  and change the ```DB_HOST``` to your database internal IP under the web-app-es service 
-3. use  docker ```compose up -d web-app-es``` to deploy the ESP version of the web page
+3. use  docker ```compose up web-app-es``` to deploy the ESP version of the web page
 
 ---
 ## web (2) [ENG]
 this is the user interface that was be created in order to access the data and allow users to submit data and view/request an email with a statistic breakdown of the collected data, it's the english version of the site
 
 ### Ports
-* 5001
+* 5000
 
 ### Deployment
 in order to deploy the web page, you need to follow these steps:
 in order to deploy the web page, you need to follow these steps:
 1. go to the web folder
 2. open the docker-compose file  and change the ```DB_HOST``` to your database internal IP under the web-app-en service 
-3. use  docker ```compose up -d web-app-en``` to deploy the ESP version of the web page
+3. use  docker ```compose up web-app-en``` to deploy the ESP version of the web page
 ---
 ## nginx
 
@@ -90,16 +90,18 @@ in order to deploy nginx you need to follow these steps:
 3. on the file ```confdummie.d``` you will find the ```server_name``` attribute under the server section, change it to the domain you have and want to set up for the project; this will allow you to obtain the certificates needed.
 4. change the ```server``` attributes under ```upstream backend_servers``` to the private IP of each machine hosting the webs, the order does not matter
 5. go out of the nginx folder, ensure that you are on the right folder by using ```ls``` and confirm you see the nginx folder and the ```docker-compose``` file
-6. run the command ```docker compose up```
-7. even though certbot can take a few seconds to create the certificates needed to execute the project, it is recommended to wait at least 1 minute in order to use the command ```docker compose down``` to shut down the container and keep the generated certificates
-8. open the ```docker-compose``` file, and go to the ```volumes``` section
-9. on the line ```- ./nginx/confdummie.d:/etc/nginx/conf.d:ro``` change the "confdummie.d" segment to "conf.d"; the line should look like ```- ./nginx/conf.d:/etc/nginx/conf.d:ro``` and save the changes
-10. open the nginx folder 
-11. open the ```conf.d```
-12. apply the same changes on step 4 
-13. on both server sections, change the ```server_name``` to the domain you want to use
-14. on the last server section, you will find the attributes ```ssl_certificate``` and ```ssl_certificate_key``` change it's values so it points to a folder with your domain name it should look like this:
+6. run the command ```docker compose up nginx```
+7. manually execute: 
+```sudo docker compose run --rm --entrypoint "certbot" certbot certonly --webroot --webroot-path=/var/www/certbot --email <mail> --agree-tos --no-eff-email -d <domain>```
+8. even though certbot can take a few seconds to create the certificates needed to execute the project, it is recommended to wait at least 1 minute in order to use the command ```docker compose down``` to shut down the container and keep the generated certificates
+9. open the ```docker-compose``` file, and go to the ```volumes``` section
+10. on the line ```- ./nginx/confdummie.d:/etc/nginx/conf.d:ro``` change the "confdummie.d" segment to "conf.d"; the line should look like ```- ./nginx/conf.d:/etc/nginx/conf.d:ro``` and save the changes
+11. open the nginx folder 
+12. open the ```conf.d```
+13. apply the same changes on step 4 
+14. on both server sections, change the ```server_name``` to the domain you want to use
+15. on the last server section, you will find the attributes ```ssl_certificate``` and ```ssl_certificate_key``` change it's values so it points to a folder with your domain name it should look like this:
     * ```ssl_certificate /etc/letsencrypt/live/<your domain>/fullchain.pem;```
     * ```ssl_certificate_key /etc/letsencrypt/live/<your domain>/privkey.pem;```
-15. use ```docker compose up``` 
+16. use ```docker compose up``` 
 
