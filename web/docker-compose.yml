@@ -5,8 +5,8 @@ services:
   # ==========================================
   web-app-es:
     build:
-      context: .
-      dockerfile: web-app/Dockerfile
+      context: ./web-app
+      dockerfile: ./Dockerfile
     container_name: eafit-web-es
     environment:
       DB_HOST: postgres
@@ -41,8 +41,8 @@ services:
   # ==========================================
   web-app-en:
     build:
-      context: .
-      dockerfile: web-app/Dockerfile
+      context: ./web-app
+      dockerfile: ./Dockerfile
     container_name: eafit-web-en
     environment:
       DB_HOST: postgres
@@ -55,7 +55,7 @@ services:
       FLASK_APP: app.py
       
     ports:
-      - "5001:5000"  # Puerto diferente (5001)
+      - "5000:5000"  # Puerto diferente (5001)
     volumes:
       - ./logs:/app/logs
 

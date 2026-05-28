@@ -1,5 +1,8 @@
 FROM python:3.11-slim
 
+# Directorio de trabajo
+WORKDIR /app
+
 # Metadatos
 LABEL maintainer="EAFIT Proyecto Final"
 LABEL description="EAFIT - Sistema de Registro de Estudiantes"
@@ -16,28 +19,26 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     postgresql-client \
     && rm -rf /var/lib/apt/lists/*
 
-# Directorio de trabajo
-WORKDIR /app
+COPY requirements.txt .
+
 
 # Instalar dependencias Python
 RUN pip install --upgrade pip setuptools wheel && \
-    pip install  Flask==2.3.0 && \
-    pip install Flask-Mail==0.9.1 && \
-    pip install psycopg2-binary && \
-    pip install Werkzeug==2.3.0 && \
+    pip install -r requirements.txt && \
     pip install gunicorn
 
 # Copiar código de aplicación
 COPY . .
 
-# Crear directorio de logs
-RUN mkdir -p logs
 
 # Crear usuario no-root
 RUN useradd -m -u 1000 appuser && \
     chown -R appuser:appuser /app
 
 USER appuser
+
+# Crear directorio de logs
+RUN mkdir -p logs
 
 # Puerto
 EXPOSE 5000
@@ -47,4 +48,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:5000/health || exit 1
 
 # Comando por defecto (ejecuta con gunicorn)
-CMD ["gunicorn", "-c", "../gunicorn_config.py", "app:app"]
+CMD ["gunicorn", "-c", "./gunicorn_config.py", "app:app"]
