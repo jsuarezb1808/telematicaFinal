@@ -3,6 +3,14 @@ from flask_mail import Mail, Message
 import psycopg2
 import os
 from datetime import datetime
+import logging
+
+# Configurar logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
 app = Flask(__name__, static_url_path='/static', static_folder='static')
 
@@ -14,12 +22,24 @@ DB_PASSWORD = os.getenv("DB_PASSWORD", "admin123")
 LANGUAGE = os.getenv("LANGUAGE", "es")
 
 # Configuración de Correo
-app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER', 'smtp.gmail.com')
-app.config['MAIL_PORT'] = int(os.getenv('MAIL_PORT', 587))
-app.config['MAIL_USE_TLS'] = os.getenv('MAIL_USE_TLS', True)
-app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
-app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
-app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_DEFAULT_SENDER', 'noreply@eafit.edu.co')
+MAIL_SERVER = os.getenv('MAIL_SERVER', 'smtp.gmail.com')
+MAIL_PORT = int(os.getenv('MAIL_PORT', 587))
+MAIL_USE_TLS = os.getenv('MAIL_USE_TLS', 'True').lower() in ['true', '1', 'yes']
+MAIL_USERNAME = os.getenv('MAIL_USERNAME')
+MAIL_PASSWORD = os.getenv('MAIL_PASSWORD')
+MAIL_DEFAULT_SENDER = os.getenv('MAIL_DEFAULT_SENDER', 'noreply@eafit.edu.co')
+
+app.config['MAIL_SERVER'] = MAIL_SERVER
+app.config['MAIL_PORT'] = MAIL_PORT
+app.config['MAIL_USE_TLS'] = MAIL_USE_TLS
+app.config['MAIL_USERNAME'] = MAIL_USERNAME
+app.config['MAIL_PASSWORD'] = MAIL_PASSWORD
+app.config['MAIL_DEFAULT_SENDER'] = MAIL_DEFAULT_SENDER
+
+# Validar configuración de email
+MAIL_CONFIGURED = bool(MAIL_USERNAME and MAIL_PASSWORD)
+if not MAIL_CONFIGURED:
+    logger.warning("⚠️ ADVERTENCIA: Sistema de email no configurado. Establece MAIL_USERNAME y MAIL_PASSWORD en .env")
 
 mail = Mail(app)
 
@@ -103,24 +123,48 @@ def admin_panel():
 @app.route("/admin/send-report", methods=["POST"])
 def send_report():
     """Genera y envía reporte de estadísticas por correo"""
+    
+    # Validar que email esté configurado
+    if not MAIL_CONFIGURED:
+        logger.error("❌ Email no configurado: MAIL_USERNAME o MAIL_PASSWORD faltante")
+        return jsonify({
+            'success': False,
+            'error': 'Sistema de email no configurado. Contacta al administrador.'
+        }), 500
+    
     try:
         # Obtener correo del request
         data = request.get_json()
-        recipient_email = data.get('email', 'ialondonoo@eafit.edu.co')
+        recipient_email = data.get('email', '').strip() if data else ''
         
         # Validar que el email no esté vacío
         if not recipient_email:
+            logger.warning("⚠️ Intento de envío sin email")
             return jsonify({
                 'success': False,
                 'error': 'El correo electrónico es requerido'
             }), 400
+        
+        # Validar formato de email
+        email_regex = r'^[^\s@]+@[^\s@]+\.[^\s@]+$'
+        import re
+        if not re.match(email_regex, recipient_email):
+            logger.warning(f"⚠️ Email inválido: {recipient_email}")
+            return jsonify({
+                'success': False,
+                'error': 'Formato de correo electrónico inválido'
+            }), 400
 
+        logger.info(f"📧 Iniciando envío de reporte a: {recipient_email}")
+        
         conn = get_connection()
         cur = conn.cursor()
         
         # Obtener estadísticas
         cur.execute("SELECT COUNT(*) FROM registros")
         total_registros = cur.fetchone()[0]
+        
+        logger.info(f"📊 Total de registros: {total_registros}")
         
         # Por comuna
         cur.execute(
@@ -139,13 +183,19 @@ def send_report():
         
         # Generar tabla HTML de comunas
         communes_html = ""
-        for comuna, cantidad in communes_data:
-            communes_html += f"<tr><td>Comuna {comuna}</td><td>{cantidad}</td></tr>"
+        if communes_data:
+            for comuna, cantidad in communes_data:
+                communes_html += f"<tr><td>Comuna {comuna}</td><td>{cantidad}</td></tr>"
+        else:
+            communes_html = "<tr><td colspan='2' style='text-align:center; color:#999;'>Sin registros</td></tr>"
         
         # Generar tabla HTML de carreras
         careers_html = ""
-        for carrera, cantidad in careers_data:
-            careers_html += f"<tr><td>{carrera}</td><td>{cantidad}</td></tr>"
+        if careers_data:
+            for carrera, cantidad in careers_data:
+                careers_html += f"<tr><td>{carrera}</td><td>{cantidad}</td></tr>"
+        else:
+            careers_html = "<tr><td colspan='2' style='text-align:center; color:#999;'>Sin registros</td></tr>"
         
         # Crear email HTML
         html_content = f"""
@@ -200,6 +250,9 @@ def send_report():
                     font-weight: bold;
                     background-color: #e8f0f8;
                     color: #2c5aa0;
+                    padding: 15px;
+                    border-radius: 5px;
+                    margin: 20px 0;
                 }}
                 .footer {{
                     margin-top: 20px;
@@ -254,23 +307,47 @@ def send_report():
         </html>
         """
         
+        logger.info(f"📝 Generando HTML del reporte...")
+        
         # Enviar correo
-        msg = Message(
-            subject='📊 Reporte de Registros EAFIT',
-            recipients=[recipient_email],
-            html=html_content
-        )
+        try:
+            msg = Message(
+                subject='📊 Reporte de Registros EAFIT',
+                recipients=[recipient_email],
+                html=html_content
+            )
+            
+            mail.send(msg)
+            logger.info(f"✅ Reporte enviado exitosamente a: {recipient_email}")
+            
+            return jsonify({
+                'success': True,
+                'message': f'Reporte enviado correctamente a {recipient_email}'
+            })
+            
+        except Exception as mail_error:
+            error_msg = str(mail_error)
+            logger.error(f"❌ Error al enviar correo: {error_msg}")
+            
+            # Proporcionar mensaje específico según el tipo de error
+            if "SMTPAuthenticationError" in error_msg or "login" in error_msg:
+                user_msg = "Error de autenticación SMTP. Verifica las credenciales de email en .env"
+            elif "SMTPServerDisconnected" in error_msg or "Connection" in error_msg:
+                user_msg = "Error de conexión al servidor SMTP. Verifica la configuración."
+            else:
+                user_msg = f"Error al enviar correo: {error_msg}"
+            
+            return jsonify({
+                'success': False,
+                'error': user_msg
+            }), 500
         
-        mail.send(msg)
-        
-        return jsonify({
-            'success': True,
-            'message': f'Reporte enviado correctamente a {recipient_email}'
-        })
     except Exception as e:
+        error_msg = str(e)
+        logger.error(f"❌ Error en send_report: {error_msg}")
         return jsonify({
             'success': False,
-            'error': str(e)
+            'error': f'Error inesperado: {error_msg}'
         }), 500
 
 if __name__ == "__main__":
