@@ -65,7 +65,18 @@ services:
       LANGUAGE: en
       FLASK_ENV: production
       FLASK_APP: app.py
-      
+          #mail
+      MAIL_SERVER: smtp.gmail.com
+      MAIL_PORT: 587
+      MAIL_USE_TLS: 1
+      MAIL_USERNAME: your-email@gmail.com
+      MAIL_PASSWORD: your-app-specific-password
+      MAIL_FROM_ADDRESS: noreply@your-server.com
+      MAIL_FROM_NAME: EAFIT Registro Sistema
+
+      # Emails separados por coma
+      REPORT_RECIPIENTS: admin@your-company.com,estadisticas@your-company.com
+
     ports:
       - "5000:5000"  # Puerto diferente (5001)
     volumes:
