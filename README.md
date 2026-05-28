@@ -54,10 +54,20 @@ this is the user interface that was be created in order to access the data and a
 * 5000
 
 ### Deployment
+in order to enable the mail sending feature through google, follow the following steps: 
+1. open the docker-compose file
+2. locate the variables ```MAIL_USERNAME``` and ```MAIL_PASSWORD```
+3. use the email address (ej:email@gmail.com) as the user, and the mail password is the mail password provided by google(not your user password)
+
+>[!NOTE]
+>is not required to have the mail feature enabled to get the page running 
+
 in order to deploy the web page, you need to follow these steps:
 1. go to the web folder
-2. open the docker-compose file  and change the ```DB_HOST``` to your database internal IP under the web-app-es service 
+2. open the docker-compose file  and change the ```DB_HOST``` to your database internal IP under the ```web-app-es``` service 
 3. use  docker ```compose up web-app-es``` to deploy the ESP version of the web page
+
+
 
 ---
 ## web (2) [ENG]
@@ -73,6 +83,8 @@ in order to deploy the web page, you need to follow these steps:
 2. open the docker-compose file  and change the ```DB_HOST``` to your database internal IP under the web-app-en service 
 3. use  docker ```compose up web-app-en``` to deploy the ESP version of the web page
 ---
+>[!NOTE]
+>web (2) [ENG] and web (1) [ESP] are exchangable, ensure the proper service is being edited on the docker-compose file uppon deployment 
 ## nginx
 
 this component acts as the load balancer of the project and ensures the users are distributed across machines evenly, it also provides a SSL certificate from certbot,since certbot needs to have a machine running to be able to provide the appropiate certificates
